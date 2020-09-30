@@ -11,6 +11,8 @@ namespace RTP {
 
 		Packet();
 
+		void get_raw(uint8_t* data, size_t& size);
+
 		uint8_t m_version;
 		bool m_padding_present;
 		bool m_extension_present;

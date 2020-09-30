@@ -65,4 +65,28 @@ namespace RTP {
 
 		return std::move(packet);
 	}
+
+	void Packet::get_raw(uint8_t* data, size_t& size) {
+		size = 12;
+		size += m_csrc_count * 4;
+		if (m_extension_present) {
+			size += 4 + m_extension_data.size();
+		}
+
+		size += m_payload.size();
+
+		data = new uint8_t[size];
+
+		// Заголовок
+		data[0] = (m_version << 6);
+		data[1] = (m_payload_type & 0x7F) | (((int)m_MarkerBit) << 7);
+		((uint16_t*)buffer)[1] = htons(m_SequenceNumber);
+		((uint32_t*)buffer)[1] = htonl(m_Timestamp);
+		((uint32_t*)buffer)[2] = htonl(m_SSRC);
+
+		// Данные
+		size_t to_copy = std::min(m_Payload.size(), size - kHeaderSize);
+		memcpy(buffer + kHeaderSize, &m_Payload[0], to_copy);
+
+	}
 }
